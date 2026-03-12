@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // Redirigir cualquier otra ruta al index.html (necesario para React Router)
-app.get('*', (req, res) => {
+app.get('*all', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
