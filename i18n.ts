@@ -205,6 +205,7 @@ export const translations = {
     orAddCustomArea: 'Or Add Custom Area',
     egGuestBedroom: 'e.g. Guest Bedroom',
     selectIconForCustomArea: 'Select Icon for Custom Area',
+    howOftenDoYouClean: 'How often do you clean this house?',
   },
   es: {
     appTitle: 'CleanTrack AI',
@@ -410,6 +411,7 @@ export const translations = {
     orAddCustomArea: 'O Añadir Área Personalizada',
     egGuestBedroom: 'ej. Habitación de Invitados',
     selectIconForCustomArea: 'Seleccionar Icono para Área Personalizada',
+    howOftenDoYouClean: '¿Con qué frecuencia limpias esta casa?',
   }
 };
 

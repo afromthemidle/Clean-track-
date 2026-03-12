@@ -93,6 +93,7 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
 
   const [dynamicSuggestions, setDynamicSuggestions] = useState<{ title: string, freq: Frequency }[]>([]);
   const [isSuggesting, setIsSuggesting] = useState(false);
+  const [houseCleaningFreq, setHouseCleaningFreq] = useState<Frequency>(Frequency.WEEKLY);
 
   const getBaseSuggestions = () => {
     const name = area?.name || '';
@@ -133,7 +134,7 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
         ...tasks.map(t => t.title),
         ...availableSuggestions.map(s => s.title)
     ];
-    const newSuggestions = await suggestMoreTasks(t(area?.name as any) || area?.name || 'Area', excludeList, language);
+    const newSuggestions = await suggestMoreTasks(t(area?.name as any) || area?.name || 'Area', excludeList, language, houseCleaningFreq);
     setDynamicSuggestions(prev => [...prev, ...newSuggestions]);
     setIsSuggesting(false);
   };
@@ -440,19 +441,33 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
                   </label>
                 ))}
               </div>
-              <div className="mt-3 flex justify-center">
-                <button
-                  type="button"
-                  onClick={handleSuggestMore}
-                  disabled={isSuggesting}
-                  className="text-sm text-primary font-semibold hover:underline flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              <div className="mt-4 border-t border-gray-100 pt-3">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('howOftenDoYouClean')}
+                </label>
+                <select
+                  value={houseCleaningFreq}
+                  onChange={e => setHouseCleaningFreq(e.target.value as Frequency)}
+                  className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-primary focus:outline-none mb-3 text-sm"
                 >
-                  {isSuggesting ? (
-                    <><i className="fa-solid fa-spinner fa-spin"></i> {t('suggesting')}</>
-                  ) : (
-                    <><i className="fa-solid fa-wand-magic-sparkles"></i> {t('suggestMoreTasks')}</>
-                  )}
-                </button>
+                  {Object.values(Frequency).map(freq => (
+                    <option key={freq} value={freq}>{t(freq.toLowerCase() as any) || freq}</option>
+                  ))}
+                </select>
+                <div className="flex justify-center">
+                  <button
+                    type="button"
+                    onClick={handleSuggestMore}
+                    disabled={isSuggesting}
+                    className="text-sm text-primary font-semibold hover:underline flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSuggesting ? (
+                      <><i className="fa-solid fa-spinner fa-spin"></i> {t('suggesting')}</>
+                    ) : (
+                      <><i className="fa-solid fa-wand-magic-sparkles"></i> {t('suggestMoreTasks')}</>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
 
