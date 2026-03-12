@@ -58,21 +58,21 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<any>(null);
-  const [language, setLanguageState] = useState<Language>('en');
+  const [language, setLanguageState] = useState<Language>('es');
   
   const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-    localStorage.setItem('language', lang);
+    setLanguageState('es');
+    localStorage.setItem('language', 'es');
   };
 
   const t = useCallback((key: TranslationKey | string): string => {
-    const translation = translations[language][key as TranslationKey];
+    const translation = translations['es'][key as TranslationKey];
     if (translation) return translation;
     
     // Fallback: format camelCase to Title Case
     const result = key.replace(/([A-Z])/g, " $1");
     return result.charAt(0).toUpperCase() + result.slice(1);
-  }, [language]);
+  }, []);
 
   const [state, setState] = useState<AppState>({
     apartments: [],
@@ -85,11 +85,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const savedLang = localStorage.getItem('language') as Language;
-    if (savedLang && (savedLang === 'en' || savedLang === 'es')) {
-      setLanguageState(savedLang);
-    }
-
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });

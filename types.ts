@@ -1,11 +1,11 @@
 export type Language = 'en' | 'es';
 
 export enum Frequency {
-  DAILY = 'Daily',
-  WEEKLY = 'Weekly',
-  BIWEEKLY = 'Bi-Weekly',
-  MONTHLY = 'Monthly',
-  QUARTERLY = 'Quarterly'
+  DAILY = 'Diario',
+  WEEKLY = 'Semanal',
+  BIWEEKLY = 'Quincenal',
+  MONTHLY = 'Mensual',
+  QUARTERLY = 'Trimestral'
 }
 
 export enum TaskStatus {

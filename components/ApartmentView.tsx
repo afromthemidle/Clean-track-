@@ -10,14 +10,14 @@ interface ApartmentViewProps {
 }
 
 const ICONS = [
-    { label: 'kitchen', icon: 'fa-utensils' },
-    { label: 'livingRoom', icon: 'fa-couch' },
-    { label: 'bedroom', icon: 'fa-bed' },
-    { label: 'bathroom', icon: 'fa-bath' },
-    { label: 'office', icon: 'fa-briefcase' },
-    { label: 'entrance', icon: 'fa-door-open' },
-    { label: 'entertainment', icon: 'fa-tv' },
-    { label: 'storage', icon: 'fa-box' },
+    { label: 'Cocina', icon: 'fa-utensils' },
+    { label: 'Sala de Estar', icon: 'fa-couch' },
+    { label: 'Dormitorio', icon: 'fa-bed' },
+    { label: 'Baño', icon: 'fa-bath' },
+    { label: 'Oficina', icon: 'fa-briefcase' },
+    { label: 'Entrada', icon: 'fa-door-open' },
+    { label: 'Entretenimiento', icon: 'fa-tv' },
+    { label: 'Almacenamiento', icon: 'fa-box' },
 ];
 
 const ApartmentView: React.FC<ApartmentViewProps> = ({ apartmentId, onBack, onSelectArea }) => {

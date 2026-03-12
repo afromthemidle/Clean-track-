@@ -6,19 +6,19 @@ export const USERS: User[] = [
 ];
 
 export const INITIAL_APARTMENTS: Apartment[] = [
-  { id: 'apt1', name: 'Main Residence', address: '123 Main St' },
-  { id: 'apt2', name: 'Rental Unit', address: '456 Ocean Dr' },
+  { id: 'apt1', name: 'Residencia Principal', address: '123 Main St' },
+  { id: 'apt2', name: 'Unidad de Alquiler', address: '456 Ocean Dr' },
 ];
 
 export const INITIAL_AREAS: Area[] = [
   // Apt 1
-  { id: 'a1', name: 'Kitchen', icon: 'fa-utensils', apartmentId: 'apt1' },
-  { id: 'a2', name: 'Living Room', icon: 'fa-couch', apartmentId: 'apt1' },
-  { id: 'a3', name: 'Master Bathroom', icon: 'fa-bath', apartmentId: 'apt1' },
-  { id: 'a4', name: 'Master Bedroom', icon: 'fa-bed', apartmentId: 'apt1' },
+  { id: 'a1', name: 'Cocina', icon: 'fa-utensils', apartmentId: 'apt1' },
+  { id: 'a2', name: 'Sala de Estar', icon: 'fa-couch', apartmentId: 'apt1' },
+  { id: 'a3', name: 'Baño Principal', icon: 'fa-bath', apartmentId: 'apt1' },
+  { id: 'a4', name: 'Dormitorio Principal', icon: 'fa-bed', apartmentId: 'apt1' },
   // Apt 2
-  { id: 'a5', name: 'Kitchenette', icon: 'fa-utensils', apartmentId: 'apt2' },
-  { id: 'a6', name: 'Bathroom', icon: 'fa-bath', apartmentId: 'apt2' },
+  { id: 'a5', name: 'Cocineta', icon: 'fa-utensils', apartmentId: 'apt2' },
+  { id: 'a6', name: 'Baño', icon: 'fa-bath', apartmentId: 'apt2' },
 ];
 
 const today = new Date().toISOString();
@@ -27,7 +27,7 @@ export const INITIAL_TASKS: Task[] = [
   // Kitchen Apt 1
   {
     id: 't1',
-    title: 'Clean Countertops',
+    title: 'Limpiar Encimeras',
     frequency: Frequency.DAILY,
     lastCompletedDate: null,
     nextDueDate: today,
@@ -35,7 +35,7 @@ export const INITIAL_TASKS: Task[] = [
   },
   {
     id: 't2',
-    title: 'Mop Floors',
+    title: 'Trapear Pisos',
     frequency: Frequency.WEEKLY,
     lastCompletedDate: null,
     nextDueDate: today,
@@ -43,7 +43,7 @@ export const INITIAL_TASKS: Task[] = [
   },
   {
     id: 't3',
-    title: 'Clean Fridge Interior',
+    title: 'Limpiar Interior del Refrigerador',
     frequency: Frequency.MONTHLY,
     lastCompletedDate: null,
     nextDueDate: today,
@@ -51,7 +51,7 @@ export const INITIAL_TASKS: Task[] = [
   },
   {
     id: 't4',
-    title: 'Degrease Oven',
+    title: 'Desengrasar Horno',
     frequency: Frequency.QUARTERLY,
     lastCompletedDate: null,
     nextDueDate: today,
@@ -60,7 +60,7 @@ export const INITIAL_TASKS: Task[] = [
   // Living Room Apt 1
   {
     id: 't5',
-    title: 'Vacuum Carpet',
+    title: 'Aspirar Alfombra',
     frequency: Frequency.WEEKLY,
     lastCompletedDate: null,
     nextDueDate: today,
@@ -68,7 +68,7 @@ export const INITIAL_TASKS: Task[] = [
   },
   {
     id: 't6',
-    title: 'Dust Shelves',
+    title: 'Desempolvar Estantes',
     frequency: Frequency.WEEKLY,
     lastCompletedDate: null,
     nextDueDate: today,
@@ -77,7 +77,7 @@ export const INITIAL_TASKS: Task[] = [
   // Bathroom Apt 1
   {
     id: 't7',
-    title: 'Scrub Toilet',
+    title: 'Lavar Inodoro',
     frequency: Frequency.WEEKLY,
     lastCompletedDate: null,
     nextDueDate: today,
@@ -85,7 +85,7 @@ export const INITIAL_TASKS: Task[] = [
   },
   {
     id: 't8',
-    title: 'Clean Mirror',
+    title: 'Limpiar Espejo',
     frequency: Frequency.WEEKLY,
     lastCompletedDate: null,
     nextDueDate: today,
@@ -94,7 +94,7 @@ export const INITIAL_TASKS: Task[] = [
   // Apt 2 tasks
   {
     id: 't9',
-    title: 'Full Clean',
+    title: 'Limpieza Completa',
     frequency: Frequency.WEEKLY,
     lastCompletedDate: null,
     nextDueDate: today,

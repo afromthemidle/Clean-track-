@@ -15,16 +15,16 @@ try {
     console.error("Failed to initialize Gemini Client", error);
 }
 
-export const suggestMoreTasks = async (areaName: string, excludeTasks: string[], language: string = 'en', maxFrequency: string = 'Weekly'): Promise<{title: string, freq: Frequency}[]> => {
+export const suggestMoreTasks = async (areaName: string, excludeTasks: string[], language: string = 'es', maxFrequency: string = 'Weekly'): Promise<{title: string, freq: Frequency}[]> => {
     if (!ai) {
         return [];
     }
     try {
-        const langInstruction = language === 'es' ? 'Please provide the task titles in Spanish.' : 'Please provide the task titles in English.';
+        const langInstruction = 'CRITICAL: You MUST provide all task titles in Spanish. Do not use English.';
         const prompt = `Suggest exactly 30 cleaning or maintenance tasks for a "${areaName}". 
         Do NOT include any of the following tasks: ${excludeTasks.join(', ')}. 
         IMPORTANT: Order the tasks by importance, putting the most important and critical tasks first, and the least important tasks last.
-        IMPORTANT: The user cleans their house with a frequency of "${maxFrequency}". Therefore, NO task should have a frequency more frequent than "${maxFrequency}". For example, if maxFrequency is "Weekly", do not suggest "Daily" tasks. Suggest "Weekly", "Bi-Weekly", "Monthly", or "Quarterly".
+        IMPORTANT: The user cleans their house with a frequency of "${maxFrequency}". Therefore, NO task should have a frequency more frequent than "${maxFrequency}". For example, if maxFrequency is "Semanal", do not suggest "Diario" tasks. Suggest "Semanal", "Quincenal", "Mensual", or "Trimestral".
         ${langInstruction}`;
 
         const response = await ai.models.generateContent({
@@ -39,11 +39,11 @@ export const suggestMoreTasks = async (areaName: string, excludeTasks: string[],
                         properties: {
                             title: {
                                 type: Type.STRING,
-                                description: "The name of the task, e.g., 'Clean the oven'",
+                                description: "The name of the task, e.g., 'Limpiar el horno'",
                             },
                             freq: {
                                 type: Type.STRING,
-                                enum: ["Daily", "Weekly", "Bi-Weekly", "Monthly", "Quarterly"],
+                                enum: ["Diario", "Semanal", "Quincenal", "Mensual", "Trimestral"],
                                 description: "The recommended frequency for this task",
                             },
                         },
@@ -69,7 +69,7 @@ export const getCleaningAdvice = async (taskTitle: string, areaName: string, lan
 
     try {
         const model = 'gemini-3-flash-preview';
-        const langInstruction = language === 'es' ? 'Please provide the advice in Spanish.' : 'Please provide the advice in English.';
+        const langInstruction = 'CRITICAL: You MUST provide the advice entirely in Spanish. Do not use English.';
         const prompt = `
         I need professional cleaning advice for the following task: "${taskTitle}" in the "${areaName}".
         
@@ -99,10 +99,10 @@ export const getSmartScheduleSuggestion = async (apartmentType: string, numResid
     try {
         const response = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
-            contents: `Suggest a cleaning frequency for a ${apartmentType} with ${numResidents} residents. Return just a suggested frequency (Daily, Weekly, Monthly) and a one sentence reason.`,
+            contents: `Sugiere una frecuencia de limpieza para un ${apartmentType} con ${numResidents} residentes. Devuelve solo una frecuencia sugerida (Diario, Semanal, Mensual) y una razón de una oración en Español.`,
         });
-        return response.text || "Weekly";
+        return response.text || "Semanal";
     } catch (e) {
-        return "Weekly";
+        return "Semanal";
     }
 }

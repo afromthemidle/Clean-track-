@@ -1,19 +1,19 @@
 export const calculateNextDueDate = (frequency: string, completionDate: Date): Date => {
   const nextDate = new Date(completionDate);
   switch (frequency) {
-    case 'Daily':
+    case 'Diario':
       nextDate.setDate(nextDate.getDate() + 1);
       break;
-    case 'Weekly':
+    case 'Semanal':
       nextDate.setDate(nextDate.getDate() + 7);
       break;
-    case 'Bi-Weekly':
+    case 'Quincenal':
       nextDate.setDate(nextDate.getDate() + 14);
       break;
-    case 'Monthly':
+    case 'Mensual':
       nextDate.setMonth(nextDate.getMonth() + 1);
       break;
-    case 'Quarterly':
+    case 'Trimestral':
       nextDate.setMonth(nextDate.getMonth() + 3);
       break;
     default:
