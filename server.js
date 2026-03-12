@@ -20,8 +20,8 @@ app.get('/health', (req, res) => {
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // Redirigir cualquier otra ruta al index.html (necesario para React Router)
-// En Express v5 el comodín correcto es (.*)
-app.get('(.*)', (req, res) => {
+// En Express v5 el comodín correcto es *
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
