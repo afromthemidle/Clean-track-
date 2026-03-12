@@ -1,0 +1,5 @@
+{
+  "name": "CleanTrack AI",
+  "description": "A smart apartment cleaning tracker with multi-apartment support, frequency-based scheduling, and AI-powered cleaning tips.",
+  "requestFramePermissions": []
+}
