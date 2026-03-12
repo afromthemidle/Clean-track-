@@ -29,7 +29,7 @@ interface AppContextType {
   session: any;
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: TranslationKey) => string;
+  t: (key: TranslationKey | string) => string;
   completeTask: (taskId: string) => void;
   addTask: (task: Task) => void;
   addTasks: (tasks: Task[]) => Promise<void>;
@@ -65,8 +65,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('language', lang);
   };
 
-  const t = useCallback((key: TranslationKey): string => {
-    return translations[language][key] || key;
+  const t = useCallback((key: TranslationKey | string): string => {
+    const translation = translations[language][key as TranslationKey];
+    if (translation) return translation;
+    
+    // Fallback: format camelCase to Title Case
+    const result = key.replace(/([A-Z])/g, " $1");
+    return result.charAt(0).toUpperCase() + result.slice(1);
   }, [language]);
 
   const [state, setState] = useState<AppState>({

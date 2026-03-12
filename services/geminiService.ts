@@ -21,7 +21,7 @@ export const suggestMoreTasks = async (areaName: string, excludeTasks: string[],
     }
     try {
         const langInstruction = language === 'es' ? 'Please provide the task titles in Spanish.' : 'Please provide the task titles in English.';
-        const prompt = `Suggest exactly 10 cleaning or maintenance tasks for a "${areaName}". 
+        const prompt = `Suggest exactly 30 cleaning or maintenance tasks for a "${areaName}". 
         Do NOT include any of the following tasks: ${excludeTasks.join(', ')}. 
         IMPORTANT: Order the tasks by importance, putting the most important and critical tasks first, and the least important tasks last.
         IMPORTANT: The user cleans their house with a frequency of "${maxFrequency}". Therefore, NO task should have a frequency more frequent than "${maxFrequency}". For example, if maxFrequency is "Weekly", do not suggest "Daily" tasks. Suggest "Weekly", "Bi-Weekly", "Monthly", or "Quarterly".
