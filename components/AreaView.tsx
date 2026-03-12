@@ -301,6 +301,13 @@ const TASK_SUGGESTIONS: Record<string, { title: string, freq: Frequency }[]> = {
   ]
 };
 
+const formatCamelCase = (str: string) => {
+  if (!str) return str;
+  if (str.includes(' ')) return str.charAt(0).toUpperCase() + str.slice(1);
+  const result = str.replace(/([A-Z])/g, " $1").trim();
+  return result.charAt(0).toUpperCase() + result.slice(1).toLowerCase();
+};
+
 const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
   const { state, getTasksByArea, completeTask, addTask, addTasks, deleteTask, assignTask, updateArea, deleteArea, t, language } = useApp();
   const area = state.areas.find(a => a.id === areaId);
@@ -564,7 +571,7 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
             >
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-bold text-gray-800">{t(task.title as any) || task.title}</h4>
+                    <h4 className="font-bold text-gray-800">{t(task.title as any) !== task.title ? t(task.title as any) : formatCamelCase(task.title)}</h4>
                     {isDue && (
                         <span className="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                             {daysOverdue > 0 ? `${t('overdue')} ${daysOverdue}d` : t('dueToday')}
@@ -633,7 +640,7 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
       <AIChatModal 
         isOpen={showAI} 
         onClose={() => setShowAI(false)} 
-        taskTitle={t(selectedTaskForAI as any) || selectedTaskForAI} 
+        taskTitle={t(selectedTaskForAI as any) !== selectedTaskForAI ? t(selectedTaskForAI as any) : formatCamelCase(selectedTaskForAI)} 
         areaName={t(area.name as any) || area.name} 
       />
 
@@ -680,7 +687,7 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
                       }}
                     />
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium text-gray-800">{t(suggestion.title as any) || suggestion.title}</span>
+                      <span className="text-sm font-medium text-gray-800">{t(suggestion.title as any) !== suggestion.title ? t(suggestion.title as any) : formatCamelCase(suggestion.title)}</span>
                       <span className="text-xs text-gray-500">{t(suggestion.freq.toLowerCase() as any) || suggestion.freq}</span>
                     </div>
                   </label>
