@@ -35,7 +35,7 @@ interface AppContextType {
   addTasks: (tasks: Task[]) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
   addApartment: (apartment: Apartment) => void;
-  updateApartment: (id: string, name: string) => Promise<void>;
+  updateApartment: (id: string, name: string, address?: string, cleaningFrequency?: Frequency) => Promise<void>;
   deleteApartment: (id: string) => Promise<void>;
   addArea: (area: Area) => void;
   addAreas: (areas: Area[]) => Promise<void>;
@@ -196,13 +196,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const updateApartment = async (id: string, name: string) => {
+  const updateApartment = async (id: string, name: string, address?: string, cleaningFrequency?: Frequency) => {
     setState(prev => ({
       ...prev,
-      apartments: prev.apartments.map(a => a.id === id ? { ...a, name } : a)
+      apartments: prev.apartments.map(a => a.id === id ? { ...a, name, address: address !== undefined ? address : a.address, cleaningFrequency: cleaningFrequency || a.cleaningFrequency } : a)
     }));
     try {
-      await updateApartmentInSupabase(id, name);
+      await updateApartmentInSupabase(id, name, address, cleaningFrequency);
     } catch (error: any) {
       alert(`Database error: ${error.message}`);
     }

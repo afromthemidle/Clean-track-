@@ -52,6 +52,7 @@ export interface Apartment {
   name: string;
   address?: string;
   ownerId?: string;
+  cleaningFrequency?: Frequency;
 }
 
 export interface AppState {

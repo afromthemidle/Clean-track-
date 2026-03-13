@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient';
-import { Apartment, Area, Task, AppState, ApartmentUser, Profile } from '../types';
+import { Apartment, Area, Task, AppState, ApartmentUser, Profile, Frequency } from '../types';
 import { INITIAL_APARTMENTS, INITIAL_AREAS, INITIAL_TASKS } from '../constants';
 
 export const fetchSupabaseData = async (userId: string): Promise<AppState | null> => {
@@ -76,7 +76,8 @@ export const fetchSupabaseData = async (userId: string): Promise<AppState | null
       id: a.id,
       name: a.name,
       address: a.address,
-      ownerId: a.owner_id
+      ownerId: a.owner_id,
+      cleaningFrequency: a.cleaning_frequency || Frequency.WEEKLY
     }));
 
     const areas: Area[] = (areasRes.data || []).map(a => ({
@@ -138,9 +139,21 @@ export const syncInitialDataToSupabase = async (userId: string) => {
         id: a.id,
         name: a.name,
         address: a.address,
-        owner_id: userId
+        owner_id: userId,
+        cleaning_frequency: a.cleaningFrequency || Frequency.WEEKLY
       }));
-      await supabase.from('apartments').insert(aptsToInsert);
+      try {
+        await supabase.from('apartments').insert(aptsToInsert);
+      } catch (e) {
+        // Fallback if cleaning_frequency doesn't exist
+        const fallbackApts = INITIAL_APARTMENTS.map(a => ({
+          id: a.id,
+          name: a.name,
+          address: a.address,
+          owner_id: userId
+        }));
+        await supabase.from('apartments').insert(fallbackApts);
+      }
 
       // Insert Areas
       const areasToInsert = INITIAL_AREAS.map(a => ({
@@ -210,29 +223,49 @@ export const insertTaskToSupabase = async (task: Task) => {
 };
 
 export const insertApartmentToSupabase = async (apartment: Apartment) => {
-  const { error } = await supabase
-    .from('apartments')
-    .insert({
-      id: apartment.id,
-      name: apartment.name,
-      address: apartment.address,
-      owner_id: apartment.ownerId
-    });
-    
-  if (error) {
-    console.error("Supabase insert error:", error);
-    throw error;
+  try {
+    const { error } = await supabase
+      .from('apartments')
+      .insert({
+        id: apartment.id,
+        name: apartment.name,
+        address: apartment.address,
+        owner_id: apartment.ownerId,
+        cleaning_frequency: apartment.cleaningFrequency || Frequency.WEEKLY
+      });
+    if (error) throw error;
+  } catch (e) {
+    const { error } = await supabase
+      .from('apartments')
+      .insert({
+        id: apartment.id,
+        name: apartment.name,
+        address: apartment.address,
+        owner_id: apartment.ownerId
+      });
+    if (error) {
+      console.error("Supabase insert error:", error);
+      throw error;
+    }
   }
 };
 
-export const updateApartmentInSupabase = async (id: string, name: string) => {
-  const { error } = await supabase
-    .from('apartments')
-    .update({ name })
-    .eq('id', id);
-  if (error) {
-    console.error("Supabase update error:", error);
-    throw error;
+export const updateApartmentInSupabase = async (id: string, name: string, address?: string, cleaningFrequency?: string) => {
+  try {
+    const { error } = await supabase
+      .from('apartments')
+      .update({ name, address, cleaning_frequency: cleaningFrequency })
+      .eq('id', id);
+    if (error) throw error;
+  } catch (e) {
+    const { error } = await supabase
+      .from('apartments')
+      .update({ name, address })
+      .eq('id', id);
+    if (error) {
+      console.error("Supabase update error:", error);
+      throw error;
+    }
   }
 };
 

@@ -335,7 +335,9 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
 
   const [dynamicSuggestions, setDynamicSuggestions] = useState<{ title: string, freq: Frequency }[]>([]);
   const [isSuggesting, setIsSuggesting] = useState(false);
-  const [houseCleaningFreq, setHouseCleaningFreq] = useState<Frequency>(Frequency.WEEKLY);
+
+  const apartment = state.apartments.find(a => a.id === area.apartmentId);
+  const houseCleaningFreq = apartment?.cleaningFrequency || Frequency.WEEKLY;
 
   const getBaseSuggestions = () => {
     const name = area?.name || '';
@@ -390,13 +392,18 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
 
   const handleSuggestMore = async () => {
     setIsSuggesting(true);
-    const excludeList = [
-        ...tasks.map(t => t.title),
-        ...availableSuggestions.map(s => s.title)
-    ];
-    const newSuggestions = await suggestMoreTasks(t(area?.name as any) || area?.name || 'Area', excludeList, language, houseCleaningFreq);
-    setDynamicSuggestions(prev => [...prev, ...newSuggestions]);
-    setIsSuggesting(false);
+    try {
+      const excludeList = [
+          ...tasks.map(t => t.title),
+          ...availableSuggestions.map(s => s.title)
+      ];
+      const newSuggestions = await suggestMoreTasks(t(area?.name as any) || area?.name || 'Area', excludeList, language, houseCleaningFreq);
+      setDynamicSuggestions(prev => [...prev, ...newSuggestions]);
+    } catch (error: any) {
+      alert(error.message || t('failedToFetchAdvice'));
+    } finally {
+      setIsSuggesting(false);
+    }
   };
 
   const handleAddTasks = async (e: React.FormEvent) => {
@@ -483,8 +490,6 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
 
   if (!area) return <div>{t('areaNotFound')}</div>;
 
-  const apartment = state.apartments.find(a => a.id === area.apartmentId);
-  
   const members = state.apartmentUsers.filter(au => au.apartmentId === area.apartmentId);
   const acceptedMembers = members.filter(m => m.status === 'accepted');
   const owner = state.profiles.find(p => p.id === apartment?.ownerId);
@@ -702,18 +707,6 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
                 ))}
               </div>
               <div className="mt-4 border-t border-gray-100 pt-3">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('howOftenDoYouClean')}
-                </label>
-                <select
-                  value={houseCleaningFreq}
-                  onChange={e => setHouseCleaningFreq(e.target.value as Frequency)}
-                  className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-primary focus:outline-none mb-3 text-sm"
-                >
-                  {Object.values(Frequency).map(freq => (
-                    <option key={freq} value={freq}>{t(freq.toLowerCase() as any) || freq}</option>
-                  ))}
-                </select>
                 <div className="flex justify-center">
                   <button
                     type="button"

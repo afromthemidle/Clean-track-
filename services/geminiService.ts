@@ -3,13 +3,15 @@ import { Frequency } from '../types';
 
 // NOTE: In a real environment, this should be accessed safely.
 // For this demo, we assume the environment variable is set.
-const API_KEY = process.env.GEMINI_API_KEY || '';
+const API_KEY = (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined) || import.meta.env.VITE_GEMINI_API_KEY || '';
 
 let ai: GoogleGenAI | null = null;
 
 try {
     if (API_KEY) {
         ai = new GoogleGenAI({ apiKey: API_KEY });
+    } else {
+        console.warn("Gemini API Key is missing. AI features will be disabled. Please set VITE_GEMINI_API_KEY or GEMINI_API_KEY in your environment variables.");
     }
 } catch (error) {
     console.error("Failed to initialize Gemini Client", error);
@@ -17,7 +19,7 @@ try {
 
 export const suggestMoreTasks = async (areaName: string, excludeTasks: string[], language: string = 'es', maxFrequency: string = 'Weekly'): Promise<{title: string, freq: Frequency}[]> => {
     if (!ai) {
-        return [];
+        throw new Error("Gemini API is not configured. Please set your API key.");
     }
     try {
         const langInstruction = 'CRITICAL: You MUST provide all task titles in Spanish. Do not use English.';
@@ -58,7 +60,7 @@ export const suggestMoreTasks = async (areaName: string, excludeTasks: string[],
         return tasks;
     } catch (error) {
         console.error("Gemini API Error:", error);
-        return [];
+        throw new Error("Failed to fetch suggestions from Gemini API. Please check your API key and try again.");
     }
 };
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { Frequency } from '../types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import Modal from './Modal';
 
@@ -15,8 +16,12 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectApartment }) => {
   const [newAptName, setNewAptName] = useState('');
   const [newAptAddress, setNewAptAddress] = useState('');
 
+  const [newAptFreq, setNewAptFreq] = useState<Frequency>(Frequency.WEEKLY);
+
   const [editAptId, setEditAptId] = useState<string | null>(null);
   const [editAptName, setEditAptName] = useState('');
+  const [editAptAddress, setEditAptAddress] = useState('');
+  const [editAptFreq, setEditAptFreq] = useState<Frequency>(Frequency.WEEKLY);
 
   const handleAddApartment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,19 +35,23 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectApartment }) => {
         id: `local-apt-${Date.now()}`,
         name: newAptName,
         address: newAptAddress,
-        ownerId: ownerId
+        ownerId: ownerId,
+        cleaningFrequency: newAptFreq
     });
     setNewAptName('');
     setNewAptAddress('');
+    setNewAptFreq(Frequency.WEEKLY);
     setIsModalOpen(false);
   };
 
   const handleEditApartment = (e: React.FormEvent) => {
     e.preventDefault();
     if (editAptId && editAptName) {
-      updateApartment(editAptId, editAptName);
+      updateApartment(editAptId, editAptName, editAptAddress, editAptFreq);
       setEditAptId(null);
       setEditAptName('');
+      setEditAptAddress('');
+      setEditAptFreq(Frequency.WEEKLY);
     }
   };
 
@@ -175,6 +184,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectApartment }) => {
                             e.stopPropagation();
                             setEditAptId(apt.id);
                             setEditAptName(apt.name);
+                            setEditAptAddress(apt.address || '');
+                            setEditAptFreq(apt.cleaningFrequency || Frequency.WEEKLY);
                           }}
                           className="text-gray-500 hover:text-primary transition text-sm flex items-center gap-1"
                         >
@@ -229,6 +240,18 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectApartment }) => {
                     placeholder={t('egBeachAve')}
                 />
             </div>
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('howOftenDoYouClean')}</label>
+                <select
+                  value={newAptFreq}
+                  onChange={e => setNewAptFreq(e.target.value as Frequency)}
+                  className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-primary focus:outline-none"
+                >
+                  {Object.values(Frequency).map(freq => (
+                    <option key={freq} value={freq}>{t(freq.toLowerCase() as any) || freq}</option>
+                  ))}
+                </select>
+            </div>
             <div className="pt-2">
                 <button type="submit" className="w-full bg-primary text-white font-bold py-2 rounded-lg hover:bg-sky-600 transition">
                     {t('createApartment')}
@@ -249,6 +272,28 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectApartment }) => {
                     className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-primary focus:outline-none"
                     placeholder={t('egVacationHome')}
                 />
+            </div>
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('address')}</label>
+                <input 
+                    type="text" 
+                    value={editAptAddress}
+                    onChange={e => setEditAptAddress(e.target.value)}
+                    className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-primary focus:outline-none"
+                    placeholder={t('egBeachAve')}
+                />
+            </div>
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('howOftenDoYouClean')}</label>
+                <select
+                  value={editAptFreq}
+                  onChange={e => setEditAptFreq(e.target.value as Frequency)}
+                  className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-primary focus:outline-none"
+                >
+                  {Object.values(Frequency).map(freq => (
+                    <option key={freq} value={freq}>{t(freq.toLowerCase() as any) || freq}</option>
+                  ))}
+                </select>
             </div>
             <div className="pt-2">
                 <button type="submit" className="w-full bg-primary text-white font-bold py-2 rounded-lg hover:bg-sky-600 transition">
