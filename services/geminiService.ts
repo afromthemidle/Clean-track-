@@ -70,37 +70,6 @@ export const suggestMoreTasks = async (areaName: string, excludeTasks: string[],
     }
 };
 
-export const getCleaningAdvice = async (taskTitle: string, areaName: string, language: string = 'en'): Promise<string> => {
-    if (!ai) {
-        return language === 'es' ? "Por favor configura tu API Key para obtener consejos inteligentes." : "Please configure your API Key to get smart advice.";
-    }
-
-    try {
-        const model = 'gemini-3-flash-preview';
-        const langInstruction = 'CRITICAL: You MUST provide the advice entirely in Spanish. Do not use English.';
-        const prompt = `
-        I need professional cleaning advice for the following task: "${taskTitle}" in the "${areaName}".
-        
-        Please provide:
-        1. A brief list of recommended tools/products.
-        2. A concise step-by-step guide (max 3-4 steps).
-        3. A "pro tip" for better results.
-        
-        Keep the tone helpful and motivating. Format with simple markdown. ${langInstruction}
-        `;
-
-        const response = await ai.models.generateContent({
-            model: model,
-            contents: prompt,
-        });
-
-        return response.text || "No advice available at the moment.";
-    } catch (error) {
-        console.error("Gemini API Error:", error);
-        return "Sorry, I couldn't fetch the cleaning advice right now. Please try again later.";
-    }
-};
-
 export const getSmartScheduleSuggestion = async (apartmentType: string, numResidents: number): Promise<string> => {
    if (!ai) return "Gemini not configured.";
     

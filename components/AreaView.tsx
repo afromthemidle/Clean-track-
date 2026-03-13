@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Task, Frequency } from '../types';
-import AIChatModal from './AIChatModal';
 import Modal from './Modal';
 import { suggestMoreTasks } from '../services/geminiService';
 
@@ -313,9 +312,6 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
   const area = state.areas.find(a => a.id === areaId);
   const tasks = getTasksByArea(areaId);
   
-  const [showAI, setShowAI] = useState(false);
-  const [selectedTaskForAI, setSelectedTaskForAI] = useState<string>('');
-  
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   // Custom task state
@@ -505,11 +501,6 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
     completeTask(taskId);
   };
 
-  const handleAskAI = (taskTitle: string) => {
-    setSelectedTaskForAI(taskTitle);
-    setShowAI(true);
-  };
-
   const handleAssignTask = async (taskId: string, userId: string) => {
     await assignTask(taskId, userId);
   };
@@ -623,13 +614,6 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
 
               <div className="flex items-center gap-3 justify-end mt-4 sm:mt-0">
                 <button
-                    onClick={() => handleAskAI(task.title)}
-                    className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-50 to-violet-50 text-indigo-600 hover:from-indigo-100 hover:to-violet-100 transition-all shadow-sm hover:shadow-md active:scale-95"
-                    title={t('getAIAdvice')}
-                >
-                    <i className="fa-solid fa-wand-magic-sparkles"></i>
-                </button>
-                <button
                     onClick={() => handleDeleteTask(task.id)}
                     className="flex items-center justify-center w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 hover:bg-rose-100 transition-all shadow-sm hover:shadow-md active:scale-95"
                     title={t('deleteTask')}
@@ -654,13 +638,6 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
           );
         })}
       </div>
-
-      <AIChatModal 
-        isOpen={showAI} 
-        onClose={() => setShowAI(false)} 
-        taskTitle={t(selectedTaskForAI as any) !== selectedTaskForAI ? t(selectedTaskForAI as any) : formatCamelCase(selectedTaskForAI)} 
-        areaName={t(area.name as any) || area.name} 
-      />
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={t('addTasks')}>
         <form onSubmit={handleAddTasks} className="space-y-6">
