@@ -4,17 +4,30 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
     <title>CleanTrack AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
           extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              display: ['Outfit', 'sans-serif'],
+            },
             colors: {
-              primary: '#0ea5e9',
-              secondary: '#10b981',
-              dark: '#1e293b',
-              light: '#f1f5f9'
+              primary: '#0d9488', /* Teal 600 */
+              'primary-hover': '#0f766e', /* Teal 700 */
+              secondary: '#f59e0b', /* Amber 500 */
+              dark: '#0f172a', /* Slate 900 */
+              light: '#f8fafc', /* Slate 50 */
+              surface: '#ffffff',
+            },
+            boxShadow: {
+              'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+              'glow': '0 0 15px rgba(13, 148, 136, 0.3)',
             }
           }
         }
@@ -23,6 +36,12 @@
     <style>
       body {
         background-color: #f8fafc;
+        color: #334155;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        font-family: 'Outfit', sans-serif;
       }
       /* Hide scrollbar for clean horizontal scrolling */
       .no-scrollbar::-webkit-scrollbar {
@@ -31,6 +50,12 @@
       .no-scrollbar {
         -ms-overflow-style: none;
         scrollbar-width: none;
+      }
+      /* Smooth transitions */
+      * {
+        transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 150ms;
       }
     </style>
   <script type="importmap">
@@ -44,7 +69,6 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
   <body>
     <div id="root"></div>

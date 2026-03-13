@@ -55,8 +55,14 @@ export const suggestMoreTasks = async (areaName: string, excludeTasks: string[],
             },
         });
 
-        const jsonStr = response.text?.trim() || "[]";
-        const tasks = JSON.parse(jsonStr);
+        let tasks = [];
+        try {
+            const jsonStr = response.text?.trim() || "[]";
+            tasks = JSON.parse(jsonStr);
+        } catch (parseError) {
+            console.error("Failed to parse Gemini response:", parseError, response.text);
+            throw new Error("Failed to parse suggestions from Gemini API.");
+        }
         return tasks;
     } catch (error) {
         console.error("Gemini API Error:", error);

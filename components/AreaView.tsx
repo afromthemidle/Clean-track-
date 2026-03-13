@@ -521,33 +521,35 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
 
   return (
     <div className="space-y-6 animate-fade-in pb-20">
-      <div className="flex items-center justify-between sticky top-0 bg-slate-50/90 backdrop-blur-sm py-4 z-10 border-b border-gray-200">
-        <div className="flex items-center gap-3">
-            <button onClick={onBack} className="p-2 hover:bg-gray-200 rounded-full transition">
-            <i className="fa-solid fa-arrow-left text-gray-600"></i>
+      <div className="flex items-center justify-between sticky top-0 bg-slate-50/90 backdrop-blur-md py-4 z-10 border-b border-slate-200/50">
+        <div className="flex items-center gap-4">
+            <button onClick={onBack} className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-full transition-all shadow-sm text-slate-500 hover:text-slate-800 border border-slate-200/50">
+            <i className="fa-solid fa-arrow-left"></i>
             </button>
             <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
-                    <i className={`fa-solid ${area.icon}`}></i>
+                <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-sky-500/10 rounded-2xl flex items-center justify-center text-primary shadow-sm border border-primary/10">
+                    <i className={`fa-solid ${area.icon} text-xl`}></i>
                 </div>
-                <h2 className="text-xl font-bold text-gray-800">{t(area.name as any) || area.name} {t('tasks')}</h2>
-                <button 
-                  onClick={() => {
-                    setEditAreaName(t(area.name as any) || area.name);
-                    setIsEditAreaModalOpen(true);
-                  }}
-                  className="p-1.5 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-full transition"
-                  title={t('editArea')}
-                >
-                  <i className="fa-solid fa-pen text-sm"></i>
-                </button>
-                <button 
-                  onClick={handleDeleteArea}
-                  className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition"
-                  title={t('deleteArea')}
-                >
-                  <i className="fa-solid fa-trash text-sm"></i>
-                </button>
+                <h2 className="text-2xl font-display font-bold text-slate-800">{t(area.name as any) || area.name} {t('tasks')}</h2>
+                <div className="flex items-center gap-1 ml-2 bg-white rounded-full p-1 shadow-sm border border-slate-100">
+                  <button 
+                    onClick={() => {
+                      setEditAreaName(t(area.name as any) || area.name);
+                      setIsEditAreaModalOpen(true);
+                    }}
+                    className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
+                    title={t('editArea')}
+                  >
+                    <i className="fa-solid fa-pen text-xs"></i>
+                  </button>
+                  <button 
+                    onClick={handleDeleteArea}
+                    className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-colors"
+                    title={t('deleteArea')}
+                  >
+                    <i className="fa-solid fa-trash text-xs"></i>
+                  </button>
+                </div>
             </div>
         </div>
         <button 
@@ -556,16 +558,19 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
               setNewTaskTitle('');
               setIsModalOpen(true);
             }}
-            className="w-10 h-10 flex items-center justify-center bg-primary text-white rounded-full shadow-md hover:bg-sky-600 transition"
+            className="w-12 h-12 flex items-center justify-center bg-primary text-white rounded-2xl shadow-sm hover:shadow-glow hover:bg-primary-hover transition-all active:scale-95 text-xl"
         >
             <i className="fa-solid fa-plus"></i>
         </button>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {sortedTasks.length === 0 && (
-             <div className="py-12 text-center text-gray-400">
-                 <p>{t('noTasksYet')}</p>
+             <div className="py-20 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50/50">
+                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
+                  <i className="fa-solid fa-clipboard-list text-4xl text-slate-300"></i>
+                </div>
+                <p className="text-lg font-medium">{t('noTasksYet')}</p>
              </div>
         )}
         {sortedTasks.map(task => {
@@ -578,34 +583,34 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
             <div 
                 key={task.id} 
                 className={`
-                    relative p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center gap-4 transition-all
-                    ${isDue ? 'bg-white border-orange-200 shadow-sm' : 'bg-gray-50 border-gray-100 opacity-75'}
+                    relative p-5 rounded-3xl border flex flex-col sm:flex-row sm:items-center gap-5 transition-all duration-300
+                    ${isDue ? 'bg-white border-slate-200 shadow-sm hover:shadow-soft' : 'bg-slate-50/50 border-slate-100 opacity-80 hover:opacity-100'}
                 `}
             >
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-bold text-gray-800">{t(task.title as any) !== task.title ? t(task.title as any) : formatCamelCase(task.title)}</h4>
+                <div className="flex items-center gap-3 mb-2">
+                    <h4 className="font-display font-bold text-slate-800 text-lg">{t(task.title as any) !== task.title ? t(task.title as any) : formatCamelCase(task.title)}</h4>
                     {isDue && (
-                        <span className="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        <span className="bg-rose-100 text-rose-700 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
                             {daysOverdue > 0 ? `${t('overdue')} ${daysOverdue}d` : t('dueToday')}
                         </span>
                     )}
                 </div>
-                <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 mt-2">
-                    <span className="flex items-center gap-1">
-                        <i className="fa-regular fa-clock"></i> {t(task.frequency.toLowerCase() as any) || task.frequency}
+                <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-500 mt-2">
+                    <span className="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-lg">
+                        <i className="fa-regular fa-clock text-slate-400"></i> {t(task.frequency.toLowerCase() as any) || task.frequency}
                     </span>
                     {task.lastCompletedDate && (
-                         <span className="flex items-center gap-1 text-green-600">
+                         <span className="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">
                             <i className="fa-solid fa-check"></i> {t('lastCompleted')}: {new Date(task.lastCompletedDate).toLocaleDateString()}
                         </span>
                     )}
-                    <div className="flex items-center gap-1 ml-auto sm:ml-0">
-                        <i className="fa-solid fa-user"></i>
+                    <div className="flex items-center gap-1.5 ml-auto sm:ml-0 bg-slate-100 px-2.5 py-1 rounded-lg">
+                        <i className="fa-solid fa-user text-slate-400"></i>
                         <select
                             value={task.assignedTo || ''}
                             onChange={(e) => handleAssignTask(task.id, e.target.value)}
-                            className="bg-transparent border-none text-xs font-semibold text-gray-600 focus:ring-0 cursor-pointer"
+                            className="bg-transparent border-none text-xs font-bold text-slate-600 focus:ring-0 cursor-pointer p-0"
                         >
                             <option value="">{t('unassigned')}</option>
                             {assignableUsers.map(u => (
@@ -616,17 +621,17 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 justify-end mt-3 sm:mt-0">
+              <div className="flex items-center gap-3 justify-end mt-4 sm:mt-0">
                 <button
                     onClick={() => handleAskAI(task.title)}
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                    className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-50 to-violet-50 text-indigo-600 hover:from-indigo-100 hover:to-violet-100 transition-all shadow-sm hover:shadow-md active:scale-95"
                     title={t('getAIAdvice')}
                 >
                     <i className="fa-solid fa-wand-magic-sparkles"></i>
                 </button>
                 <button
                     onClick={() => handleDeleteTask(task.id)}
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition"
+                    className="flex items-center justify-center w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 hover:bg-rose-100 transition-all shadow-sm hover:shadow-md active:scale-95"
                     title={t('deleteTask')}
                 >
                     <i className="fa-solid fa-trash"></i>
@@ -635,12 +640,12 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
                 {isDue ? (
                     <button
                         onClick={() => handleComplete(task.id)}
-                        className="flex-1 sm:flex-none px-6 py-2 bg-secondary hover:bg-emerald-600 text-white font-bold rounded-lg shadow-sm active:scale-95 transition-all flex items-center justify-center gap-2"
+                        className="flex-1 sm:flex-none px-6 py-3 bg-secondary hover:bg-amber-500 text-white font-bold rounded-2xl shadow-sm hover:shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"
                     >
                         <i className="fa-solid fa-check"></i> {t('complete')}
                     </button>
                 ) : (
-                    <div className="text-xs font-semibold text-gray-400 bg-gray-200 px-3 py-1 rounded-md">
+                    <div className="text-xs font-bold text-slate-400 bg-slate-100 px-4 py-3 rounded-2xl shadow-inner">
                         {t('due')} {dueDate.toLocaleDateString()}
                     </div>
                 )}
@@ -662,8 +667,8 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
             
             {/* Task Suggestions */}
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-gray-700">{t('suggestedTasks')}</label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-bold text-slate-700">{t('suggestedTasks')}</label>
                 <button 
                   type="button"
                   onClick={() => {
@@ -673,23 +678,23 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
                       setSelectedSuggestions(availableSuggestions.map(s => s.title));
                     }
                   }}
-                  className="text-xs text-primary font-semibold hover:underline"
+                  className="text-xs text-primary font-bold hover:text-primary-hover transition-colors bg-primary/10 px-3 py-1.5 rounded-full"
                 >
                   {selectedSuggestions.length === availableSuggestions.length && availableSuggestions.length > 0 ? t('deselectAll') : t('selectAll')}
                 </button>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-60 overflow-y-auto p-1 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
                 {availableSuggestions.map(suggestion => (
                   <label 
                     key={suggestion.title}
                     className={`
-                      flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all
-                      ${selectedSuggestions.includes(suggestion.title) ? 'bg-primary/5 border-primary shadow-sm' : 'bg-white border-gray-200 hover:border-primary/50'}
+                      flex items-center gap-4 p-4 rounded-2xl border cursor-pointer transition-all duration-300
+                      ${selectedSuggestions.includes(suggestion.title) ? 'bg-primary/5 border-primary shadow-sm ring-1 ring-primary/20' : 'bg-white border-slate-200 hover:border-primary/50 hover:shadow-sm'}
                     `}
                   >
                     <input 
                       type="checkbox"
-                      className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
+                      className="w-5 h-5 text-primary rounded-md border-slate-300 focus:ring-primary/50 transition-all"
                       checked={selectedSuggestions.includes(suggestion.title)}
                       onChange={(e) => {
                         if (e.target.checked) {
@@ -700,19 +705,19 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
                       }}
                     />
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium text-gray-800">{t(suggestion.title as any) !== suggestion.title ? t(suggestion.title as any) : formatCamelCase(suggestion.title)}</span>
-                      <span className="text-xs text-gray-500">{t(suggestion.freq.toLowerCase() as any) || suggestion.freq}</span>
+                      <span className="text-sm font-bold text-slate-800">{t(suggestion.title as any) !== suggestion.title ? t(suggestion.title as any) : formatCamelCase(suggestion.title)}</span>
+                      <span className="text-xs font-medium text-slate-500">{t(suggestion.freq.toLowerCase() as any) || suggestion.freq}</span>
                     </div>
                   </label>
                 ))}
               </div>
-              <div className="mt-4 border-t border-gray-100 pt-3">
+              <div className="mt-6 border-t border-slate-100 pt-4">
                 <div className="flex justify-center">
                   <button
                     type="button"
                     onClick={handleSuggestMore}
                     disabled={isSuggesting}
-                    className="text-sm text-primary font-semibold hover:underline flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="text-sm text-primary font-bold hover:text-primary-hover flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-primary/5 hover:bg-primary/10 px-4 py-2 rounded-xl transition-colors"
                   >
                     {isSuggesting ? (
                       <><i className="fa-solid fa-spinner fa-spin"></i> {t('suggesting')}</>
@@ -724,23 +729,23 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
               </div>
             </div>
 
-            <div className="border-t border-gray-200 pt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('addCustomTask')}</label>
+            <div className="border-t border-slate-200 pt-6">
+                <label className="block text-sm font-bold text-slate-700 mb-2">{t('addCustomTask')}</label>
                 <input 
                     type="text" 
                     value={newTaskTitle}
                     onChange={e => setNewTaskTitle(e.target.value)}
-                    className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-primary focus:outline-none"
+                    className="w-full rounded-xl border-slate-200 border p-3 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all bg-slate-50/50"
                     placeholder={t('egDustFan')}
                 />
             </div>
             {newTaskTitle.trim() && (
-              <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('customTaskFrequency')}</label>
+              <div className="animate-fade-in">
+                  <label className="block text-sm font-bold text-slate-700 mb-2">{t('customTaskFrequency')}</label>
                   <select 
                       value={newTaskFreq}
                       onChange={e => setNewTaskFreq(e.target.value as Frequency)}
-                      className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-primary focus:outline-none"
+                      className="w-full rounded-xl border-slate-200 border p-3 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all bg-slate-50/50"
                   >
                       {Object.values(Frequency).map(freq => (
                           <option key={freq} value={freq}>{t(freq.toLowerCase() as any) || freq}</option>
@@ -749,11 +754,11 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
               </div>
             )}
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('assignToOptional')}</label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">{t('assignToOptional')}</label>
                 <select 
                     value={newTaskAssignee}
                     onChange={e => setNewTaskAssignee(e.target.value)}
-                    className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-primary focus:outline-none bg-white"
+                    className="w-full rounded-xl border-slate-200 border p-3 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all bg-slate-50/50"
                 >
                     <option value="">{t('unassigned')}</option>
                     {assignableUsers.map(u => (
@@ -761,11 +766,11 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
                     ))}
                 </select>
             </div>
-            <div className="pt-2">
+            <div className="pt-4">
                 <button 
                   type="submit" 
                   disabled={selectedSuggestions.length === 0 && !newTaskTitle.trim()}
-                  className="w-full bg-primary text-white font-bold py-2 rounded-lg hover:bg-sky-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-primary text-white font-bold py-3.5 rounded-xl hover:bg-primary-hover shadow-sm hover:shadow-glow transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-sm disabled:hover:bg-primary disabled:active:scale-100"
                 >
                     {t('add')} {selectedSuggestions.length + (newTaskTitle.trim() ? 1 : 0)} {selectedSuggestions.length + (newTaskTitle.trim() ? 1 : 0) !== 1 ? t('tasksLower') : t('taskLower')}
                 </button>
@@ -774,20 +779,20 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
       </Modal>
 
       <Modal isOpen={isEditAreaModalOpen} onClose={() => setIsEditAreaModalOpen(false)} title={t('editArea')}>
-        <form onSubmit={handleEditArea} className="space-y-4">
+        <form onSubmit={handleEditArea} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('areaName')}</label>
+            <label className="block text-sm font-bold text-slate-700 mb-2">{t('areaName')}</label>
             <input 
                 type="text" 
                 required
                 value={editAreaName}
                 onChange={e => setEditAreaName(e.target.value)}
-                className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-primary focus:outline-none"
+                className="w-full rounded-xl border-slate-200 border p-3 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all bg-slate-50/50"
                 placeholder={t('egKitchen')}
             />
           </div>
-          <div className="pt-2">
-            <button type="submit" className="w-full bg-primary text-white font-bold py-2 rounded-lg hover:bg-sky-600 transition">
+          <div className="pt-4">
+            <button type="submit" className="w-full bg-primary text-white font-bold py-3.5 rounded-xl hover:bg-primary-hover shadow-sm hover:shadow-glow transition-all active:scale-95">
                 {t('saveChanges')}
             </button>
           </div>
@@ -795,18 +800,18 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
       </Modal>
 
       <Modal isOpen={isDeleteTaskModalOpen} onClose={() => setIsDeleteTaskModalOpen(false)} title={t('deleteTask')}>
-        <div className="space-y-4">
-          <p className="text-gray-700">{t('areYouSureDeleteTask')}</p>
-          <div className="flex gap-3 pt-2">
+        <div className="space-y-6">
+          <p className="text-slate-700 font-medium">{t('areYouSureDeleteTask')}</p>
+          <div className="flex gap-4 pt-4">
             <button 
               onClick={() => setIsDeleteTaskModalOpen(false)}
-              className="flex-1 bg-gray-100 text-gray-700 font-bold py-2 rounded-lg hover:bg-gray-200 transition"
+              className="flex-1 bg-slate-100 text-slate-700 font-bold py-3.5 rounded-xl hover:bg-slate-200 transition-all active:scale-95"
             >
               {t('cancel')}
             </button>
             <button 
               onClick={confirmDeleteTask}
-              className="flex-1 bg-red-600 text-white font-bold py-2 rounded-lg hover:bg-red-700 transition"
+              className="flex-1 bg-rose-500 text-white font-bold py-3.5 rounded-xl hover:bg-rose-600 shadow-sm hover:shadow-md transition-all active:scale-95"
             >
               {t('delete')}
             </button>

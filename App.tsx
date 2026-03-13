@@ -65,39 +65,42 @@ const MainContent: React.FC = () => {
   const pendingInvites = state.apartmentUsers.filter(au => au.email === state.currentUser?.email && au.status === 'pending');
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 selection:bg-primary/20 selection:text-primary">
       {/* Navbar */}
-      <nav className="bg-white shadow-sm sticky top-0 z-20">
-        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-primary cursor-pointer" onClick={() => { setCurrentView('dashboard'); setSelectedApartmentId(null); }}>
-            <i className="fa-solid fa-broom text-xl"></i>
-            <h1 className="font-extrabold text-xl tracking-tight">{t('appTitle')}</h1>
+      <nav className="bg-white/80 backdrop-blur-md shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] sticky top-0 z-20 border-b border-slate-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3 text-primary cursor-pointer hover:opacity-80 transition-opacity" onClick={() => { setCurrentView('dashboard'); setSelectedApartmentId(null); }}>
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <i className="fa-solid fa-sparkles text-xl text-primary"></i>
+            </div>
+            <h1 className="font-display font-bold text-2xl tracking-tight text-slate-900">{t('appTitle')}</h1>
           </div>
           
           <div className="flex items-center gap-4">
              <div className="relative group">
-                <button className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition">
-                   <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">
+                <button className="flex items-center gap-3 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors bg-slate-50 hover:bg-slate-100 py-1.5 px-3 rounded-full border border-slate-200">
+                   <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-emerald-400 text-white flex items-center justify-center font-bold shadow-sm">
                      {state.currentUser?.name?.charAt(0).toUpperCase() || state.currentUser?.email?.charAt(0).toUpperCase() || '?'}
                    </div>
-                   <span className="hidden sm:inline">{state.currentUser?.name || state.currentUser?.email}</span>
-                   <i className="fa-solid fa-chevron-down text-xs"></i>
+                   <span className="hidden sm:inline font-medium">{state.currentUser?.name || state.currentUser?.email}</span>
+                   <i className="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
                 </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 hidden group-hover:block animate-fade-in">
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-slate-100 py-2 hidden group-hover:block animate-fade-in origin-top-right">
                     <button 
                         onClick={() => {
                           setProfileName(state.currentUser?.name || '');
                           setIsProfileModalOpen(true);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                        className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-3 transition-colors"
                     >
-                        <i className="fa-solid fa-user"></i> {t('editProfile')}
+                        <i className="fa-solid fa-user-pen w-4 text-center"></i> {t('editProfile')}
                     </button>
+                    <div className="h-px bg-slate-100 my-1 mx-4"></div>
                     <button 
                         onClick={signOut}
-                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                        className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
                     >
-                        <i className="fa-solid fa-sign-out-alt"></i> {t('signOut')}
+                        <i className="fa-solid fa-arrow-right-from-bracket w-4 text-center"></i> {t('signOut')}
                     </button>
                 </div>
              </div>
@@ -106,20 +109,20 @@ const MainContent: React.FC = () => {
       </nav>
 
       {/* Main Content Area */}
-      <main className="max-w-4xl mx-auto p-4 md:p-6">
+      <main className="max-w-5xl mx-auto p-4 sm:p-6 md:p-8">
         {pendingInvites.length > 0 && currentView === 'dashboard' && (
           <div className="mb-6 space-y-3">
             {pendingInvites.map(invite => {
               const apt = state.apartments.find(a => a.id === invite.apartmentId);
               return (
-                <div key={invite.id} className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-center justify-between">
+                <div key={invite.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100/50 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
                   <div>
-                    <h4 className="font-bold text-blue-900">{t('invitedMessage')}</h4>
-                    <p className="text-sm text-blue-700">{t('invitedDescription')} {apt?.name || 'an apartment'}.</p>
+                    <h4 className="font-display font-bold text-blue-900 text-lg">{t('invitedMessage')}</h4>
+                    <p className="text-sm text-blue-700/80 mt-1">{t('invitedDescription')} <span className="font-semibold text-blue-800">{apt?.name || 'an apartment'}</span>.</p>
                   </div>
                   <button 
                     onClick={() => acceptInvite(invite.id)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition"
+                    className="bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 hover:shadow-md hover:-translate-y-0.5 transition-all active:translate-y-0 w-full sm:w-auto text-center"
                   >
                     {t('accept')}
                   </button>
@@ -148,14 +151,14 @@ const MainContent: React.FC = () => {
       </main>
 
       <Modal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} title={t('editProfile')}>
-        <form onSubmit={handleUpdateProfile} className="space-y-4">
+        <form onSubmit={handleUpdateProfile} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('name')}</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('name')}</label>
             <input 
               type="text" 
               value={profileName}
               onChange={e => setProfileName(e.target.value)}
-              className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-primary focus:outline-none"
+              className="w-full rounded-xl border-slate-200 border p-3 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all bg-slate-50 focus:bg-white"
               placeholder={t('yourName')}
             />
           </div>
@@ -163,7 +166,7 @@ const MainContent: React.FC = () => {
             <button 
               type="submit" 
               disabled={isUpdatingProfile}
-              className="w-full bg-primary text-white font-bold py-2 rounded-lg hover:bg-sky-600 transition disabled:opacity-50"
+              className="w-full bg-primary text-white font-bold py-3 rounded-xl hover:bg-primary-hover hover:shadow-lg hover:shadow-primary/20 transition-all disabled:opacity-50 active:scale-[0.98]"
             >
               {isUpdatingProfile ? t('saving') : t('saveChanges')}
             </button>

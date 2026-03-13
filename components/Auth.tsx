@@ -38,54 +38,81 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-      <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 w-full max-w-md">
-        <div className="flex items-center justify-center gap-2 text-primary mb-8">
-          <i className="fa-solid fa-broom text-3xl"></i>
-          <h1 className="font-extrabold text-3xl tracking-tight">{t('appTitle')}</h1>
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4 relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-teal-100/50 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-amber-100/50 rounded-full blur-3xl"></div>
+
+      <div className="bg-white p-10 rounded-3xl shadow-xl border border-slate-100 w-full max-w-md relative z-10">
+        <div className="flex items-center justify-center gap-3 text-teal-600 mb-10">
+          <div className="w-12 h-12 bg-teal-50 rounded-2xl flex items-center justify-center shadow-sm border border-teal-100">
+            <i className="fa-solid fa-broom text-2xl"></i>
+          </div>
+          <h1 className="font-display font-extrabold text-3xl tracking-tight text-slate-800">{t('appTitle')}</h1>
         </div>
         
-        <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">
+        <h2 className="text-2xl font-display font-bold text-slate-800 mb-8 text-center">
           {isLogin ? t('welcomeBack') : t('createAccount')}
         </h2>
         
-        {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">{error}</div>}
+        {error && (
+          <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-sm flex items-start gap-3 border border-red-100">
+            <i className="fa-solid fa-circle-exclamation mt-0.5"></i>
+            <span>{error}</span>
+          </div>
+        )}
         
-        <form onSubmit={handleAuth} className="space-y-4">
+        <form onSubmit={handleAuth} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
-            <input 
-              type="email" 
-              required
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-primary focus:outline-none"
-            />
+            <label className="block text-sm font-semibold text-slate-700 mb-2">{t('email')}</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i className="fa-regular fa-envelope text-slate-400"></i>
+              </div>
+              <input 
+                type="email" 
+                required
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full rounded-xl border-slate-200 border bg-slate-50/50 pl-10 p-3 text-slate-800 focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 focus:outline-none transition-all"
+                placeholder="you@example.com"
+              />
+            </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('password')}</label>
-            <input 
-              type="password" 
-              required
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-primary focus:outline-none"
-            />
+            <label className="block text-sm font-semibold text-slate-700 mb-2">{t('password')}</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i className="fa-solid fa-lock text-slate-400"></i>
+              </div>
+              <input 
+                type="password" 
+                required
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="w-full rounded-xl border-slate-200 border bg-slate-50/50 pl-10 p-3 text-slate-800 focus:bg-white focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 focus:outline-none transition-all"
+                placeholder="••••••••"
+              />
+            </div>
           </div>
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full bg-primary text-white font-bold py-2 rounded-lg hover:bg-sky-600 transition disabled:opacity-50"
+            className="w-full bg-teal-600 text-white font-bold py-3.5 rounded-xl hover:bg-teal-700 hover:shadow-lg hover:shadow-teal-600/20 transition-all active:scale-[0.98] disabled:opacity-70 disabled:pointer-events-none mt-2 flex items-center justify-center gap-2"
           >
-            {loading ? t('loading') : (isLogin ? t('signIn') : t('signUp'))}
+            {loading ? (
+              <><i className="fa-solid fa-circle-notch fa-spin"></i> {t('loading')}</>
+            ) : (
+              isLogin ? <>{t('signIn')} <i className="fa-solid fa-arrow-right ml-1"></i></> : <>{t('signUp')} <i className="fa-solid fa-user-plus ml-1"></i></>
+            )}
           </button>
         </form>
         
-        <div className="mt-6 text-center text-sm text-gray-500">
-          {isLogin ? t('dontHaveAccount') : t('alreadyHaveAccount')}
+        <div className="mt-8 text-center text-sm text-slate-500 flex items-center justify-center gap-2">
+          <span>{isLogin ? t('dontHaveAccount') : t('alreadyHaveAccount')}</span>
           <button 
             onClick={() => setIsLogin(!isLogin)}
-            className="text-primary font-bold hover:underline"
+            className="text-teal-600 font-bold hover:text-teal-700 hover:underline transition-colors"
           >
             {isLogin ? t('signUp') : t('signIn')}
           </button>
