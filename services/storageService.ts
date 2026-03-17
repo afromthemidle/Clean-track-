@@ -16,6 +16,12 @@ export const calculateNextDueDate = (frequency: string, completionDate: Date): D
     case 'Trimestral':
       nextDate.setMonth(nextDate.getMonth() + 3);
       break;
+    case 'Semestral':
+      nextDate.setMonth(nextDate.getMonth() + 6);
+      break;
+    case 'Anual':
+      nextDate.setFullYear(nextDate.getFullYear() + 1);
+      break;
     default:
       nextDate.setDate(nextDate.getDate() + 7);
   }

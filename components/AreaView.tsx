@@ -382,7 +382,9 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
     [Frequency.WEEKLY]: 2,
     [Frequency.BIWEEKLY]: 3,
     [Frequency.MONTHLY]: 4,
-    [Frequency.QUARTERLY]: 5
+    [Frequency.QUARTERLY]: 5,
+    [Frequency.SEMIANNUAL]: 6,
+    [Frequency.ANNUAL]: 7
   };
 
   // Filter out tasks that are already added to the area and filter by frequency

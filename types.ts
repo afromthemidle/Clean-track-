@@ -5,7 +5,9 @@ export enum Frequency {
   WEEKLY = 'Semanal',
   BIWEEKLY = 'Quincenal',
   MONTHLY = 'Mensual',
-  QUARTERLY = 'Trimestral'
+  QUARTERLY = 'Trimestral',
+  SEMIANNUAL = 'Semestral',
+  ANNUAL = 'Anual'
 }
 
 export enum TaskStatus {
