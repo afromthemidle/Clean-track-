@@ -128,28 +128,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [session]);
 
   const completeTask = async (taskId: string) => {
-    let updatedTask: Task | undefined;
+    const taskToComplete = state.tasks.find(t => t.id === taskId);
+    if (!taskToComplete) return;
+
+    const now = new Date();
+    const nextDue = calculateNextDueDate(taskToComplete.frequency, now);
     
-    setState(prev => {
-      const newTasks = prev.tasks.map(t => {
-        if (t.id === taskId) {
-          const now = new Date();
-          const nextDue = calculateNextDueDate(t.frequency, now);
-          updatedTask = {
-            ...t,
-            lastCompletedDate: now.toISOString(),
-            nextDueDate: nextDue.toISOString(),
-            assignedTo: prev.currentUser?.id
-          };
-          return updatedTask;
-        }
-        return t;
-      });
-      return { ...prev, tasks: newTasks };
-    });
+    const updatedTask: Task = {
+      ...taskToComplete,
+      lastCompletedDate: now.toISOString(),
+      nextDueDate: nextDue.toISOString(),
+      assignedTo: state.currentUser?.id || taskToComplete.assignedTo
+    };
+
+    setState(prev => ({
+      ...prev,
+      tasks: prev.tasks.map(t => t.id === taskId ? updatedTask : t)
+    }));
     
-    if (updatedTask) {
+    try {
       await updateTaskInSupabase(updatedTask);
+    } catch (error: any) {
+      console.error("Failed to update task in Supabase", error);
     }
   };
 

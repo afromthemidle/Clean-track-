@@ -87,16 +87,30 @@ export const fetchSupabaseData = async (userId: string): Promise<AppState | null
       apartmentId: a.apartment_id
     }));
 
-    const tasks: Task[] = (tasksRes.data || []).map(t => ({
-      id: t.id,
-      title: t.title,
-      description: t.description,
-      frequency: t.frequency,
-      lastCompletedDate: t.last_completed_date,
-      nextDueDate: t.next_due_date,
-      assignedTo: t.assigned_to,
-      areaId: t.area_id
-    }));
+    const tasks: Task[] = (tasksRes.data || []).map(t => {
+      let description = t.description;
+      let suggestedFrequency = undefined;
+      try {
+        if (description && description.startsWith('{')) {
+          const parsed = JSON.parse(description);
+          description = parsed.text;
+          suggestedFrequency = parsed.suggestedFrequency;
+        }
+      } catch (e) {
+        // Not a JSON string
+      }
+      return {
+        id: t.id,
+        title: t.title,
+        description,
+        frequency: t.frequency,
+        suggestedFrequency,
+        lastCompletedDate: t.last_completed_date,
+        nextDueDate: t.next_due_date,
+        assignedTo: t.assigned_to,
+        areaId: t.area_id
+      };
+    });
 
     const apartmentUsers: ApartmentUser[] = (aptUsersRes.data || []).map(au => ({
       id: au.id,
@@ -186,41 +200,46 @@ export const syncInitialDataToSupabase = async (userId: string) => {
 
 export const updateTaskInSupabase = async (task: Task) => {
   try {
+    const description = task.suggestedFrequency ? JSON.stringify({ text: task.description || '', suggestedFrequency: task.suggestedFrequency }) : (task.description || null);
     const { error } = await supabase
       .from('tasks')
       .update({
         title: task.title,
+        description,
         frequency: task.frequency,
-        last_completed_date: task.lastCompletedDate,
+        last_completed_date: task.lastCompletedDate || null,
         next_due_date: task.nextDueDate,
-        assigned_to: task.assignedTo
+        assigned_to: task.assignedTo || null
       })
       .eq('id', task.id);
       
     if (error) throw error;
   } catch (e) {
     console.error("Error updating task in Supabase", e);
+    throw e;
   }
 };
 
 export const insertTaskToSupabase = async (task: Task) => {
   try {
+    const description = task.suggestedFrequency ? JSON.stringify({ text: task.description || '', suggestedFrequency: task.suggestedFrequency }) : (task.description || null);
     const { error } = await supabase
       .from('tasks')
       .insert({
         id: task.id,
         title: task.title,
-        description: task.description,
+        description,
         frequency: task.frequency,
-        last_completed_date: task.lastCompletedDate,
+        last_completed_date: task.lastCompletedDate || null,
         next_due_date: task.nextDueDate,
-        assigned_to: task.assignedTo,
+        assigned_to: task.assignedTo || null,
         area_id: task.areaId
       });
       
     if (error) throw error;
   } catch (e) {
     console.error("Error inserting task to Supabase", e);
+    throw e;
   }
 };
 

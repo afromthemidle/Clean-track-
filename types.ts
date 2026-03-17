@@ -36,6 +36,7 @@ export interface Task {
   title: string;
   description?: string;
   frequency: Frequency;
+  suggestedFrequency?: Frequency;
   lastCompletedDate: string | null; // ISO Date string
   nextDueDate: string; // ISO Date string
   assignedTo?: string; // profile ID

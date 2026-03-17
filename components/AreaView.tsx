@@ -497,7 +497,8 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
   const handleOpenEditTask = (task: Task) => {
     setTaskToEdit(task);
     setEditTaskTitle(task.title);
-    setEditTaskFreq(task.frequency);
+    const isOwner = state.currentUser?.id === apartment?.ownerId;
+    setEditTaskFreq(isOwner ? task.frequency : (task.suggestedFrequency || task.frequency));
     setEditTaskAssignee(task.assignedTo || '');
     setIsEditTaskModalOpen(true);
   };
@@ -505,20 +506,37 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
   const handleEditTask = async (e: React.FormEvent) => {
     e.preventDefault();
     if (taskToEdit && editTaskTitle.trim()) {
+      const isOwner = state.currentUser?.id === apartment?.ownerId;
+      const isAssignee = state.currentUser?.id === taskToEdit.assignedTo;
+      
       let nextDueDate = taskToEdit.nextDueDate;
+      let frequency = taskToEdit.frequency;
+      let suggestedFrequency = taskToEdit.suggestedFrequency;
+
       if (taskToEdit.frequency !== editTaskFreq) {
-        if (taskToEdit.lastCompletedDate) {
-          const nextDue = calculateNextDueDate(editTaskFreq, new Date(taskToEdit.lastCompletedDate));
-          nextDueDate = nextDue.toISOString();
-        } else {
-          nextDueDate = new Date().toISOString();
+        if (isOwner) {
+          frequency = editTaskFreq;
+          suggestedFrequency = undefined; // clear any suggestion
+          if (taskToEdit.lastCompletedDate) {
+            const nextDue = calculateNextDueDate(editTaskFreq, new Date(taskToEdit.lastCompletedDate));
+            nextDueDate = nextDue.toISOString();
+          } else {
+            nextDueDate = new Date().toISOString();
+          }
+        } else if (isAssignee) {
+          suggestedFrequency = editTaskFreq;
+        }
+      } else {
+        if (isAssignee && !isOwner) {
+          suggestedFrequency = undefined; // clear suggestion if reverted to original
         }
       }
 
       await updateTask({
         ...taskToEdit,
         title: editTaskTitle.trim(),
-        frequency: editTaskFreq,
+        frequency,
+        suggestedFrequency,
         nextDueDate,
         assignedTo: editTaskAssignee || undefined
       });
@@ -546,6 +564,30 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
 
   const handleAssignTask = async (taskId: string, userId: string) => {
     await assignTask(taskId, userId);
+  };
+
+  const handleApproveSuggestion = async (task: Task) => {
+    if (!task.suggestedFrequency) return;
+    let nextDueDate = task.nextDueDate;
+    if (task.lastCompletedDate) {
+      const nextDue = calculateNextDueDate(task.suggestedFrequency, new Date(task.lastCompletedDate));
+      nextDueDate = nextDue.toISOString();
+    } else {
+      nextDueDate = new Date().toISOString();
+    }
+    await updateTask({
+      ...task,
+      frequency: task.suggestedFrequency,
+      suggestedFrequency: undefined,
+      nextDueDate
+    });
+  };
+
+  const handleRejectSuggestion = async (task: Task) => {
+    await updateTask({
+      ...task,
+      suggestedFrequency: undefined
+    });
   };
 
   const sortedTasks = [...tasks].sort((a, b) => {
@@ -634,6 +676,17 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
                     <span className="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-lg">
                         <i className="fa-regular fa-clock text-slate-400"></i> {t(task.frequency.toLowerCase() as any) || task.frequency}
                     </span>
+                    {task.suggestedFrequency && (
+                        <span className="flex items-center gap-1.5 bg-amber-100 text-amber-700 px-2.5 py-1 rounded-lg">
+                            <i className="fa-solid fa-lightbulb"></i> {t('suggested')}: {t(task.suggestedFrequency.toLowerCase() as any) || task.suggestedFrequency}
+                            {state.currentUser?.id === apartment?.ownerId && (
+                                <div className="flex items-center gap-1 ml-2">
+                                    <button onClick={() => handleApproveSuggestion(task)} className="hover:text-emerald-600 transition-colors" title={t('approve')}><i className="fa-solid fa-check"></i></button>
+                                    <button onClick={() => handleRejectSuggestion(task)} className="hover:text-rose-600 transition-colors" title={t('reject')}><i className="fa-solid fa-xmark"></i></button>
+                                </div>
+                            )}
+                        </span>
+                    )}
                     {task.lastCompletedDate && (
                          <span className="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">
                             <i className="fa-solid fa-check"></i> {t('lastCompleted')}: {new Date(task.lastCompletedDate).toLocaleDateString()}
@@ -859,11 +912,17 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
             />
           </div>
           <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">{t('frequency')}</label>
+              <label className="block text-sm font-bold text-slate-700 mb-2">
+                {t('frequency')} 
+                {taskToEdit && state.currentUser?.id !== apartment?.ownerId && state.currentUser?.id === taskToEdit.assignedTo && (
+                  <span className="ml-2 text-xs font-normal text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">{t('suggested')}</span>
+                )}
+              </label>
               <select 
                   value={editTaskFreq}
                   onChange={e => setEditTaskFreq(e.target.value as Frequency)}
-                  className="w-full rounded-xl border-slate-200 border p-3 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all bg-slate-50/50"
+                  disabled={taskToEdit ? (state.currentUser?.id !== apartment?.ownerId && state.currentUser?.id !== taskToEdit.assignedTo) : false}
+                  className="w-full rounded-xl border-slate-200 border p-3 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all bg-slate-50/50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                   {Object.values(Frequency).map(freq => (
                       <option key={freq} value={freq}>{t(freq.toLowerCase() as any) || freq}</option>
