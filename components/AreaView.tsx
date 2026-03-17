@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext';
 import { Task, Frequency } from '../types';
 import Modal from './Modal';
 import { suggestMoreTasks } from '../services/geminiService';
+import { calculateNextDueDate } from '../services/storageService';
 
 interface AreaViewProps {
   areaId: string;
@@ -308,7 +309,7 @@ const formatCamelCase = (str: string) => {
 };
 
 const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
-  const { state, getTasksByArea, completeTask, addTask, addTasks, deleteTask, assignTask, updateArea, deleteArea, t, language } = useApp();
+  const { state, getTasksByArea, completeTask, addTask, updateTask, addTasks, deleteTask, assignTask, updateArea, deleteArea, t, language } = useApp();
   const area = state.areas.find(a => a.id === areaId);
   const tasks = getTasksByArea(areaId);
   
@@ -328,6 +329,13 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
 
   const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+
+  // Edit Task state
+  const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
+  const [editTaskTitle, setEditTaskTitle] = useState('');
+  const [editTaskFreq, setEditTaskFreq] = useState<Frequency>(Frequency.WEEKLY);
+  const [editTaskAssignee, setEditTaskAssignee] = useState<string>('');
 
   const [dynamicSuggestions, setDynamicSuggestions] = useState<{ title: string, freq: Frequency }[]>([]);
   const [isSuggesting, setIsSuggesting] = useState(false);
@@ -484,6 +492,39 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
     }
   };
 
+  const handleOpenEditTask = (task: Task) => {
+    setTaskToEdit(task);
+    setEditTaskTitle(task.title);
+    setEditTaskFreq(task.frequency);
+    setEditTaskAssignee(task.assignedTo || '');
+    setIsEditTaskModalOpen(true);
+  };
+
+  const handleEditTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (taskToEdit && editTaskTitle.trim()) {
+      let nextDueDate = taskToEdit.nextDueDate;
+      if (taskToEdit.frequency !== editTaskFreq) {
+        if (taskToEdit.lastCompletedDate) {
+          const nextDue = calculateNextDueDate(editTaskFreq, new Date(taskToEdit.lastCompletedDate));
+          nextDueDate = nextDue.toISOString();
+        } else {
+          nextDueDate = new Date().toISOString();
+        }
+      }
+
+      await updateTask({
+        ...taskToEdit,
+        title: editTaskTitle.trim(),
+        frequency: editTaskFreq,
+        nextDueDate,
+        assignedTo: editTaskAssignee || undefined
+      });
+      setIsEditTaskModalOpen(false);
+      setTaskToEdit(null);
+    }
+  };
+
   if (!area) return <div>{t('areaNotFound')}</div>;
 
   const members = state.apartmentUsers.filter(au => au.apartmentId === area.apartmentId);
@@ -613,6 +654,13 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
               </div>
 
               <div className="flex items-center gap-3 justify-end mt-4 sm:mt-0">
+                <button
+                    onClick={() => handleOpenEditTask(task)}
+                    className="flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-primary transition-all shadow-sm hover:shadow-md active:scale-95"
+                    title={t('editTask')}
+                >
+                    <i className="fa-solid fa-pen"></i>
+                </button>
                 <button
                     onClick={() => handleDeleteTask(task.id)}
                     className="flex items-center justify-center w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 hover:bg-rose-100 transition-all shadow-sm hover:shadow-md active:scale-95"
@@ -794,6 +842,51 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
             </button>
           </div>
         </div>
+      </Modal>
+
+      <Modal isOpen={isEditTaskModalOpen} onClose={() => setIsEditTaskModalOpen(false)} title={t('editTask')}>
+        <form onSubmit={handleEditTask} className="space-y-6">
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">{t('taskName')}</label>
+            <input 
+                type="text" 
+                required
+                value={editTaskTitle}
+                onChange={e => setEditTaskTitle(e.target.value)}
+                className="w-full rounded-xl border-slate-200 border p-3 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all bg-slate-50/50"
+            />
+          </div>
+          <div>
+              <label className="block text-sm font-bold text-slate-700 mb-2">{t('frequency')}</label>
+              <select 
+                  value={editTaskFreq}
+                  onChange={e => setEditTaskFreq(e.target.value as Frequency)}
+                  className="w-full rounded-xl border-slate-200 border p-3 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all bg-slate-50/50"
+              >
+                  {Object.values(Frequency).map(freq => (
+                      <option key={freq} value={freq}>{t(freq.toLowerCase() as any) || freq}</option>
+                  ))}
+              </select>
+          </div>
+          <div>
+              <label className="block text-sm font-bold text-slate-700 mb-2">{t('assignToOptional')}</label>
+              <select 
+                  value={editTaskAssignee}
+                  onChange={e => setEditTaskAssignee(e.target.value)}
+                  className="w-full rounded-xl border-slate-200 border p-3 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all bg-slate-50/50"
+              >
+                  <option value="">{t('unassigned')}</option>
+                  {assignableUsers.map(u => (
+                      <option key={u.id} value={u.id}>{u.name || u.email}</option>
+                  ))}
+              </select>
+          </div>
+          <div className="pt-4">
+            <button type="submit" className="w-full bg-primary text-white font-bold py-3.5 rounded-xl hover:bg-primary-hover shadow-sm hover:shadow-glow transition-all active:scale-95">
+                {t('saveChanges')}
+            </button>
+          </div>
+        </form>
       </Modal>
     </div>
   );

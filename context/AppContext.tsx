@@ -32,6 +32,7 @@ interface AppContextType {
   t: (key: TranslationKey | string) => string;
   completeTask: (taskId: string) => void;
   addTask: (task: Task) => void;
+  updateTask: (task: Task) => Promise<void>;
   addTasks: (tasks: Task[]) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
   addApartment: (apartment: Apartment) => void;
@@ -158,6 +159,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       tasks: [...prev.tasks, task]
     }));
     await insertTaskToSupabase(task);
+  };
+
+  const updateTask = async (task: Task) => {
+    setState(prev => ({
+      ...prev,
+      tasks: prev.tasks.map(t => t.id === task.id ? task : t)
+    }));
+    try {
+      await updateTaskInSupabase(task);
+    } catch (error: any) {
+      alert(`Database error: ${error.message}`);
+    }
   };
 
   const addTasks = async (tasks: Task[]) => {
@@ -351,6 +364,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       t,
       completeTask, 
       addTask,
+      updateTask,
       addTasks,
       deleteTask,
       addApartment, 

@@ -189,6 +189,8 @@ export const updateTaskInSupabase = async (task: Task) => {
     const { error } = await supabase
       .from('tasks')
       .update({
+        title: task.title,
+        frequency: task.frequency,
         last_completed_date: task.lastCompletedDate,
         next_due_date: task.nextDueDate,
         assigned_to: task.assignedTo
