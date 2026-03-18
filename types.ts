@@ -41,6 +41,7 @@ export interface Task {
   nextDueDate: string; // ISO Date string
   assignedTo?: string; // profile ID
   areaId: string;
+  type?: 'cleaning' | 'maintenance';
 }
 
 export interface Area {

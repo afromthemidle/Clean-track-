@@ -90,11 +90,15 @@ export const fetchSupabaseData = async (userId: string): Promise<AppState | null
     const tasks: Task[] = (tasksRes.data || []).map(t => {
       let description = t.description;
       let suggestedFrequency = undefined;
+      let type: 'cleaning' | 'maintenance' = 'cleaning';
       try {
         if (description && description.startsWith('{')) {
           const parsed = JSON.parse(description);
           description = parsed.text;
           suggestedFrequency = parsed.suggestedFrequency;
+          if (parsed.type) {
+            type = parsed.type;
+          }
         }
       } catch (e) {
         // Not a JSON string
@@ -108,7 +112,8 @@ export const fetchSupabaseData = async (userId: string): Promise<AppState | null
         lastCompletedDate: t.last_completed_date,
         nextDueDate: t.next_due_date,
         assignedTo: t.assigned_to,
-        areaId: t.area_id
+        areaId: t.area_id,
+        type
       };
     });
 
@@ -200,7 +205,8 @@ export const syncInitialDataToSupabase = async (userId: string) => {
 
 export const updateTaskInSupabase = async (task: Task) => {
   try {
-    const description = task.suggestedFrequency ? JSON.stringify({ text: task.description || '', suggestedFrequency: task.suggestedFrequency }) : (task.description || null);
+    const needsJson = task.suggestedFrequency || task.type === 'maintenance';
+    const description = needsJson ? JSON.stringify({ text: task.description || '', suggestedFrequency: task.suggestedFrequency, type: task.type }) : (task.description || null);
     const { error } = await supabase
       .from('tasks')
       .update({
@@ -222,7 +228,8 @@ export const updateTaskInSupabase = async (task: Task) => {
 
 export const insertTaskToSupabase = async (task: Task) => {
   try {
-    const description = task.suggestedFrequency ? JSON.stringify({ text: task.description || '', suggestedFrequency: task.suggestedFrequency }) : (task.description || null);
+    const needsJson = task.suggestedFrequency || task.type === 'maintenance';
+    const description = needsJson ? JSON.stringify({ text: task.description || '', suggestedFrequency: task.suggestedFrequency, type: task.type }) : (task.description || null);
     const { error } = await supabase
       .from('tasks')
       .insert({
@@ -329,16 +336,21 @@ export const deleteTaskFromSupabase = async (id: string) => {
 
 export const insertTasksToSupabase = async (tasks: Task[]) => {
   try {
-    const { error } = await supabase.from('tasks').insert(tasks.map(t => ({
-      id: t.id,
-      title: t.title,
-      description: t.description,
-      frequency: t.frequency,
-      last_completed_date: t.lastCompletedDate,
-      next_due_date: t.nextDueDate,
-      assigned_to: t.assignedTo,
-      area_id: t.areaId
-    })));
+    const { error } = await supabase.from('tasks').insert(tasks.map(t => {
+      const needsJson = t.suggestedFrequency || t.type === 'maintenance';
+      const description = needsJson ? JSON.stringify({ text: t.description || '', suggestedFrequency: t.suggestedFrequency, type: t.type }) : (t.description || null);
+      
+      return {
+        id: t.id,
+        title: t.title,
+        description,
+        frequency: t.frequency,
+        last_completed_date: t.lastCompletedDate || null,
+        next_due_date: t.nextDueDate,
+        assigned_to: t.assignedTo || null,
+        area_id: t.areaId
+      };
+    }));
     if (error) throw error;
   } catch (e) {
     console.error("Error inserting tasks to Supabase", e);

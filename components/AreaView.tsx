@@ -319,6 +319,7 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskFreq, setNewTaskFreq] = useState<Frequency>(Frequency.WEEKLY);
   const [newTaskAssignee, setNewTaskAssignee] = useState<string>('');
+  const [newTaskType, setNewTaskType] = useState<'cleaning' | 'maintenance'>('cleaning');
 
   // Suggestions state
   const [selectedSuggestions, setSelectedSuggestions] = useState<string[]>([]);
@@ -336,9 +337,12 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
   const [editTaskTitle, setEditTaskTitle] = useState('');
   const [editTaskFreq, setEditTaskFreq] = useState<Frequency>(Frequency.WEEKLY);
   const [editTaskAssignee, setEditTaskAssignee] = useState<string>('');
+  const [editTaskType, setEditTaskType] = useState<'cleaning' | 'maintenance'>('cleaning');
 
   const [dynamicSuggestions, setDynamicSuggestions] = useState<{ title: string, freq: Frequency }[]>([]);
   const [isSuggesting, setIsSuggesting] = useState(false);
+
+  const [activeTab, setActiveTab] = useState<'cleaning' | 'maintenance'>('cleaning');
 
   const apartment = state.apartments.find(a => a.id === area.apartmentId);
   const houseCleaningFreq = apartment?.cleaningFrequency || Frequency.WEEKLY;
@@ -429,7 +433,8 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
           areaId: areaId,
           lastCompletedDate: null,
           nextDueDate: now,
-          assignedTo: newTaskAssignee || undefined
+          assignedTo: newTaskAssignee || undefined,
+          type: newTaskType
         });
       }
     });
@@ -443,7 +448,8 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
         areaId: areaId,
         lastCompletedDate: null,
         nextDueDate: now,
-        assignedTo: newTaskAssignee || undefined
+        assignedTo: newTaskAssignee || undefined,
+        type: newTaskType
       });
     }
 
@@ -460,6 +466,7 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
     setNewTaskTitle('');
     setNewTaskFreq(Frequency.WEEKLY);
     setNewTaskAssignee('');
+    setNewTaskType('cleaning');
     setSelectedSuggestions([]);
     setIsModalOpen(false);
   };
@@ -500,6 +507,7 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
     const isOwner = state.currentUser?.id === apartment?.ownerId;
     setEditTaskFreq(isOwner ? task.frequency : (task.suggestedFrequency || task.frequency));
     setEditTaskAssignee(task.assignedTo || '');
+    setEditTaskType(task.type || 'cleaning');
     setIsEditTaskModalOpen(true);
   };
 
@@ -538,7 +546,8 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
         frequency,
         suggestedFrequency,
         nextDueDate,
-        assignedTo: editTaskAssignee || undefined
+        assignedTo: editTaskAssignee || undefined,
+        type: editTaskType
       });
       setIsEditTaskModalOpen(false);
       setTaskToEdit(null);
@@ -590,10 +599,12 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
     });
   };
 
-  const sortedTasks = [...tasks].sort((a, b) => {
-     // Sort by due date ascending (overdue first)
-     return new Date(a.nextDueDate).getTime() - new Date(b.nextDueDate).getTime();
-  });
+  const sortedTasks = [...tasks]
+    .filter(t => (t.type || 'cleaning') === activeTab)
+    .sort((a, b) => {
+       // Sort by due date ascending (overdue first)
+       return new Date(a.nextDueDate).getTime() - new Date(b.nextDueDate).getTime();
+    });
 
   return (
     <div className="space-y-6 animate-fade-in pb-20">
@@ -632,11 +643,27 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
             onClick={() => {
               setSelectedSuggestions([]);
               setNewTaskTitle('');
+              setNewTaskType(activeTab);
               setIsModalOpen(true);
             }}
             className="w-12 h-12 flex items-center justify-center bg-primary text-white rounded-2xl shadow-sm hover:shadow-glow hover:bg-primary-hover transition-all active:scale-95 text-xl"
         >
             <i className="fa-solid fa-plus"></i>
+        </button>
+      </div>
+
+      <div className="flex gap-2 mb-4">
+        <button
+          onClick={() => setActiveTab('cleaning')}
+          className={`flex-1 py-2 rounded-xl font-bold transition-all ${activeTab === 'cleaning' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+        >
+          {t('cleaning')}
+        </button>
+        <button
+          onClick={() => setActiveTab('maintenance')}
+          className={`flex-1 py-2 rounded-xl font-bold transition-all ${activeTab === 'maintenance' ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+        >
+          {t('maintenance')}
         </button>
       </div>
 
@@ -810,6 +837,16 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
             </div>
 
             <div className="border-t border-slate-200 pt-6">
+                <label className="block text-sm font-bold text-slate-700 mb-2">{t('taskType')}</label>
+                <select 
+                    value={newTaskType}
+                    onChange={e => setNewTaskType(e.target.value as 'cleaning' | 'maintenance')}
+                    className="w-full rounded-xl border-slate-200 border p-3 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all bg-slate-50/50 mb-4"
+                >
+                    <option value="cleaning">{t('cleaning')}</option>
+                    <option value="maintenance">{t('maintenance')}</option>
+                </select>
+
                 <label className="block text-sm font-bold text-slate-700 mb-2">{t('addCustomTask')}</label>
                 <input 
                     type="text" 
@@ -910,6 +947,17 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
                 onChange={e => setEditTaskTitle(e.target.value)}
                 className="w-full rounded-xl border-slate-200 border p-3 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all bg-slate-50/50"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">{t('taskType')}</label>
+            <select 
+                value={editTaskType}
+                onChange={e => setEditTaskType(e.target.value as 'cleaning' | 'maintenance')}
+                className="w-full rounded-xl border-slate-200 border p-3 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all bg-slate-50/50"
+            >
+                <option value="cleaning">{t('cleaning')}</option>
+                <option value="maintenance">{t('maintenance')}</option>
+            </select>
           </div>
           <div>
               <label className="block text-sm font-bold text-slate-700 mb-2">

@@ -150,6 +150,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       await updateTaskInSupabase(updatedTask);
     } catch (error: any) {
       console.error("Failed to update task in Supabase", error);
+      alert(`Error al completar la tarea: ${error.message}`);
+      // Revert state
+      setState(prev => ({
+        ...prev,
+        tasks: prev.tasks.map(t => t.id === taskId ? taskToComplete : t)
+      }));
     }
   };
 
