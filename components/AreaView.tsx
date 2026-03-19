@@ -10,7 +10,7 @@ interface AreaViewProps {
   onBack: () => void;
 }
 
-const TASK_SUGGESTIONS: Record<string, { title: string, freq: Frequency }[]> = {
+const TASK_SUGGESTIONS: Record<string, { title: string, freq: Frequency, type?: 'cleaning' | 'maintenance' }[]> = {
   'Cocina': [
     { title: 'Fregar los platos', freq: Frequency.DAILY },
     { title: 'Limpiar las encimeras', freq: Frequency.DAILY },
@@ -42,6 +42,10 @@ const TASK_SUGGESTIONS: Record<string, { title: string, freq: Frequency }[]> = {
     { title: 'Descongelar el congelador', freq: Frequency.QUARTERLY },
     { title: 'Lavar las cortinas de la cocina', freq: Frequency.QUARTERLY },
     { title: 'Limpiar las lámparas de techo', freq: Frequency.QUARTERLY },
+    { title: 'Revisar fugas de agua en el fregadero', freq: Frequency.MONTHLY, type: 'maintenance' },
+    { title: 'Renovar la silicona del fregadero', freq: Frequency.ANNUAL, type: 'maintenance' },
+    { title: 'Limpiar el filtro de la campana extractora', freq: Frequency.QUARTERLY, type: 'maintenance' },
+    { title: 'Revisar las bisagras de los armarios', freq: Frequency.SEMIANNUAL, type: 'maintenance' },
   ],
   'Sala de Estar': [
     { title: 'Recoger objetos desordenados', freq: Frequency.DAILY },
@@ -138,6 +142,11 @@ const TASK_SUGGESTIONS: Record<string, { title: string, freq: Frequency }[]> = {
     { title: 'Lavar el forro de plástico de la ducha', freq: Frequency.QUARTERLY },
     { title: 'Limpiar la báscula', freq: Frequency.QUARTERLY },
     { title: 'Limpiar a fondo las juntas de los azulejos', freq: Frequency.QUARTERLY },
+    { title: 'Revisar posibles fugas de agua', freq: Frequency.SEMIANNUAL, type: 'maintenance' },
+    { title: 'Renovar la silicona de las juntas', freq: Frequency.ANNUAL, type: 'maintenance' },
+    { title: 'Limpiar el sifón del lavabo', freq: Frequency.SEMIANNUAL, type: 'maintenance' },
+    { title: 'Revisar el mecanismo de la cisterna', freq: Frequency.ANNUAL, type: 'maintenance' },
+    { title: 'Desatascar desagües preventivamente', freq: Frequency.QUARTERLY, type: 'maintenance' },
   ],
   'Oficina': [
     { title: 'Despejar el escritorio', freq: Frequency.DAILY },
@@ -298,6 +307,9 @@ const TASK_SUGGESTIONS: Record<string, { title: string, freq: Frequency }[]> = {
     { title: 'Pulir los muebles de madera', freq: Frequency.QUARTERLY },
     { title: 'Reemplazar los filtros de aire', freq: Frequency.QUARTERLY },
     { title: 'Donar o desechar cosas sin uso', freq: Frequency.QUARTERLY },
+    { title: 'Revisar enchufes e interruptores', freq: Frequency.SEMIANNUAL, type: 'maintenance' },
+    { title: 'Revisar pintura y paredes', freq: Frequency.ANNUAL, type: 'maintenance' },
+    { title: 'Lubricar bisagras de puertas', freq: Frequency.SEMIANNUAL, type: 'maintenance' },
   ]
 };
 
@@ -339,7 +351,7 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
   const [editTaskAssignee, setEditTaskAssignee] = useState<string>('');
   const [editTaskType, setEditTaskType] = useState<'cleaning' | 'maintenance'>('cleaning');
 
-  const [dynamicSuggestions, setDynamicSuggestions] = useState<{ title: string, freq: Frequency }[]>([]);
+  const [dynamicSuggestions, setDynamicSuggestions] = useState<{ title: string, freq: Frequency, type?: 'cleaning' | 'maintenance' }[]>([]);
   const [isSuggesting, setIsSuggesting] = useState(false);
 
   const [activeTab, setActiveTab] = useState<'cleaning' | 'maintenance'>('cleaning');
@@ -397,7 +409,8 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
     const translatedTitle = t(s.title as any) || s.title;
     const notExists = !existingTaskTitles.includes(s.title.toLowerCase()) && !existingTaskTitles.includes(translatedTitle.toLowerCase());
     const freqAllowed = freqOrder[s.freq] >= freqOrder[houseCleaningFreq];
-    return notExists && freqAllowed;
+    const typeMatches = (s.type || 'cleaning') === (isModalOpen ? newTaskType : activeTab);
+    return notExists && freqAllowed && typeMatches;
   });
 
   const handleSuggestMore = async () => {
@@ -407,8 +420,9 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
           ...tasks.map(t => t.title),
           ...availableSuggestions.map(s => s.title)
       ];
-      const newSuggestions = await suggestMoreTasks(t(area?.name as any) || area?.name || 'Area', excludeList, language, houseCleaningFreq);
-      setDynamicSuggestions(prev => [...prev, ...newSuggestions]);
+      const newSuggestions = await suggestMoreTasks(t(area?.name as any) || area?.name || 'Area', excludeList, language, houseCleaningFreq, newTaskType);
+      const typedSuggestions = newSuggestions.map(s => ({ ...s, type: newTaskType }));
+      setDynamicSuggestions(prev => [...prev, ...typedSuggestions]);
     } catch (error: any) {
       alert(error.message || t('failedToFetchAdvice'));
     } finally {
@@ -840,7 +854,10 @@ const AreaView: React.FC<AreaViewProps> = ({ areaId, onBack }) => {
                 <label className="block text-sm font-bold text-slate-700 mb-2">{t('taskType')}</label>
                 <select 
                     value={newTaskType}
-                    onChange={e => setNewTaskType(e.target.value as 'cleaning' | 'maintenance')}
+                    onChange={e => {
+                      setNewTaskType(e.target.value as 'cleaning' | 'maintenance');
+                      setSelectedSuggestions([]);
+                    }}
                     className="w-full rounded-xl border-slate-200 border p-3 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all bg-slate-50/50 mb-4"
                 >
                     <option value="cleaning">{t('cleaning')}</option>

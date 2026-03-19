@@ -17,13 +17,18 @@ try {
     console.error("Failed to initialize Gemini Client", error);
 }
 
-export const suggestMoreTasks = async (areaName: string, excludeTasks: string[], language: string = 'es', maxFrequency: string = 'Weekly'): Promise<{title: string, freq: Frequency}[]> => {
+export const suggestMoreTasks = async (areaName: string, excludeTasks: string[], language: string = 'es', maxFrequency: string = 'Weekly', taskType: 'cleaning' | 'maintenance' = 'cleaning'): Promise<{title: string, freq: Frequency}[]> => {
     if (!ai) {
         throw new Error("Gemini API is not configured. Please set your API key.");
     }
     try {
         const langInstruction = 'CRITICAL: You MUST provide all task titles in Spanish. Do not use English.';
-        const prompt = `Suggest exactly 30 cleaning or maintenance tasks for a "${areaName}". 
+        const taskTypeInstruction = taskType === 'maintenance' 
+            ? 'CRITICAL: Suggest ONLY technical maintenance tasks (e.g., renewing silicone joints in ceramics, checking pipes for leaks, changing filters, fixing hinges, lubricating doors, checking electrical outlets). ABSOLUTELY DO NOT suggest any cleaning tasks (like sweeping, mopping, dusting, wiping, washing, organizing).'
+            : 'CRITICAL: Suggest ONLY cleaning tasks (e.g., sweeping, mopping, dusting, wiping, washing, organizing). ABSOLUTELY DO NOT suggest any technical maintenance tasks (like fixing pipes, renewing silicone, changing filters, checking electrical outlets).';
+
+        const prompt = `Suggest exactly 30 tasks for a "${areaName}". 
+        ${taskTypeInstruction}
         Do NOT include any of the following tasks: ${excludeTasks.join(', ')}. 
         IMPORTANT: Order the tasks by importance, putting the most important and critical tasks first, and the least important tasks last.
         IMPORTANT: The user cleans their house with a frequency of "${maxFrequency}". Therefore, NO task should have a frequency more frequent than "${maxFrequency}". For example, if maxFrequency is "Semanal", do not suggest "Diario" tasks. Suggest "Semanal", "Quincenal", "Mensual", or "Trimestral".
